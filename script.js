@@ -175,7 +175,7 @@ var amountOfPages = 0
 var I = 0; 
 var core_amount = 0; // initial
 var roundingLosses = 0; // initial
-let batchAmount = 10 // seperate into 10 batches.
+let batchAmount = 20 // seperate into batches.
 
 var loadCounter = document.getElementById("loadingNum");
 var loadProgress = 0;
@@ -252,7 +252,7 @@ let time = performance.now()
     for (let i = 0; i < core_amount - roundingLosses; i++) {
       promises.push(fetchTracks(I));
       I += 1;
-      console.log("next track fetch");
+      console.log("last track fetch");
       loadProgress += 1;
       loadCounter.innerHTML = "loading track ID's... " + (loadProgress / amountOfPages * 100).toFixed(3) + `% <br> (${loadProgress}/${amountOfPages})`;
    
@@ -299,6 +299,7 @@ let time = performance.now()
 function IDtoPlayers(IDs) {
   var IDCount = IDs.length;
 console.log(IDCount)
+setTimeout(function(){
   var loadCounter = document.getElementById("loadingNum");
   var loadProgress = 0;
   
@@ -370,7 +371,9 @@ console.log(IDCount)
       displayPie(dataList);
 
     });
+  },100000)
 }
+// end of function
 
 
 function displayPie(theData) {
