@@ -158,14 +158,139 @@ async function wrCount(countAll) {
       
       I += 1;
     }
-  } else {
-    IDarr = await fetch("alltracks.json");
-    IDarr = await IDarr.json();
-  }
-  
-  console.log(IDarr);
+
+    console.log(IDarr);
   IDtoPlayers(IDarr);
   
+  } else {
+
+    var IDarr = [];
+
+var maxPages = 5000;
+var minPage = 0;
+var maxPage = maxPages;
+var threshold = 5;
+var amountOfPages = 0
+
+var I = 0; 
+var core_amount = 0; // initial
+var roundingLosses = 0; // initial
+let batchAmount = 10 // seperate into 10 batches.
+
+var loadCounter = document.getElementById("loadingNum");
+var loadProgress = 0;
+
+async function fetchTracks(startIndex) {
+  var IDL = await fetch(URL1 + startIndex + "/50?sort=2");
+  IDL = await IDL.json();
+
+  return IDL.map(track => track._id);
+}
+
+async function guessAmountOfTracks() {
+
+  while (minPage < maxPage) {
+    var middlePage = Math.floor((minPage + maxPage) / 2);
+
+    console.log("Currently getting page",middlePage)
+    var results = await fetchTracks(middlePage);
+
+    if (results.length === 0) {
+      maxPage = middlePage - 1;
+    } else {
+      minPage = middlePage;
+
+      // start making individual requests
+      if (maxPage - minPage < threshold) {
+        console.log("Found a range smaller than threshold. Initiating individual requests.");
+
+        while (true) {
+          var individualResults = await fetchTracks(minPage);
+
+    console.log("Individual page",minPage)
+
+          // Break the loop if an empty array is found
+          if (individualResults.length === 0) {
+            break;
+          }
+
+          minPage++;
+        }
+
+        break; // stop when all individual requests are done
+      }
+    }
+  }
+    minPage -= 1 // avoid getting the #page of the empty page.
+  console.log("Found the page with a mix of empty and non-empty results:", minPage);
+    return minPage
+}
+
+async function setCoreAmount() {
+  amountOfPages = await guessAmountOfTracks();
+  core_amount = amountOfPages
+
+  roundingLosses = Math.ceil(core_amount % batchAmount);
+  core_amount = Math.ceil(core_amount / batchAmount);
+}
+
+setCoreAmount().then(() => {
+  fetchAllTracks(); // Set the number of requests at the same time to the amount of tracks
+    
+});
+
+
+async function fetchAllTracks() {
+let time = performance.now()
+    var I2 = 0
+    
+    while (true) {
+    var promises = [];
+    I2++
+        if (I2 == batchAmount) { // last batch
+          
+    for (let i = 0; i < core_amount - roundingLosses; i++) {
+      promises.push(fetchTracks(I));
+      I += 1;
+      console.log("next track fetch");
+    }
+        } else {
+            
+    for (let i = 0; i < core_amount; i++) {
+      promises.push(fetchTracks(I));
+      I += 1;
+      console.log("next track fetch");
+      loadProgress += 1;
+      loadCounter.innerHTML = "loading track ID's... " + (loadProgress / amountOfPages * 100).toFixed(3) + `% <br> (${loadProgress}/${amountOfPages})`;
+            
+    }
+        }
+
+    var results = await Promise.all(promises);
+        console.log("next batch")
+
+    // Push arrays directly into IDarr
+    IDarr.push(...results);
+
+    if (results.some(result => result.length === 0)) {
+        console.error("This shouldn't activate anymore... \nDid the track amount function fail?")
+      break;
+    }
+        if (I2 == batchAmount) {
+            // last batch, no need to run again
+            break
+        }
+  }
+  IDarr = IDarr.flat();
+  console.log(IDarr);
+    console.log("Total time to fetch:",(performance.now()-time)/1000)
+
+  IDtoPlayers(IDarr);
+
+}
+
+    
+  }
 }
 
 function IDtoPlayers(IDs) {
