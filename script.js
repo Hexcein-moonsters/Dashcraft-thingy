@@ -389,83 +389,75 @@ async function wrCount(countAll) {
 }
 
 function IDtoPlayers(IDs) {
-    var IDCount = IDs.length;
-    console.log(IDCount)
-    setTimeout(function() {
-        var loadCounter = document.getElementById("loadingNum");
-        var loadProgress = 0;
+    const IDCount = IDs.length;
+    const loadCounter = document.getElementById("loadingNum");
+    let loadProgress = 0;
 
-        var fetches = [];
-        var checkCheats = document.getElementById("cheatFilter").checked;
-        for (let ID = 0; ID < IDs.length; ID++) {
-            try {
-                fetcH = fetch("https://api.dashcraft.io/track/" + IDs[ID] + "?supportsLaps1=true")
-                    .then((response) => response.json())
-                    .then((json) => {
-                        jsonLB = json.leaderboard;
-                        var trackName = json.name;
-                        if (trackName == "") {
-                            trackName = "Unnamed Track"
+    const fetches = [];
+    const checkCheats = document.getElementById("cheatFilter").checked;
+    const batchSize = 100;
+
+    const fetchBatch = async (start, end) => {
+        const batchFetches = [];
+        for (let ID = start; ID < end; ID++) {
+            const fetcH = fetch("https://api.dashcraft.io/track/" + IDs[ID] + "?supportsLaps1=true")
+                .then(response => response.json())
+                .then(json => {
+                    const jsonLB = json.leaderboard;
+                    const trackName = json.name || "Unnamed Track";
+                    const track = [json._id, trackName];
+
+                    for (let v = 0; v < jsonLB.length; v++) {
+                        const username = jsonLB[v].userId.username;
+                        const time = jsonLB[v].time;
+
+                        if (!checkCheats || (!banlist.includes(username) /* || (Math.round(time) == time)*/ )) {
+                            loadProgress++;
+                            loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+                            return [username, track];
+                        } else {
+                            console.log(`${username} -- ${IDs[ID]}`);
                         }
-                        var track = [json._id, trackName];
+                    }
 
-                        for (let v = 0; v < jsonLB.length; v++) {
-                            var username = jsonLB[v].userId.username;
+                    if (jsonLB.length === 0) {
+                        loadProgress++;
+                        loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+                        return ["Empty Leaderboard", track];
+                    }
+                });
 
-                            var time = jsonLB[v].time;
-                            if (!checkCheats) {
-                                loadProgress += 1;
-                                loadCounter.innerHTML = "loading... " + (loadProgress / IDCount * 100).toFixed(3) + `% <br> (${loadProgress}/${IDCount})`;
-                                return [username, track];
-                            } else if (!(banlist.includes(username) /* || (Math.round(time) == time)*/ )) {
-                                loadProgress += 1;
-                                loadCounter.innerHTML = "loading... " + (loadProgress / IDCount * 100).toFixed(3) + `% <br> (${loadProgress}/${IDCount})`;
-                                return [username, track];
-                            } else {
-                                console.log(username + " -- " + IDs[ID])
-                            }
-                        }
-                        if (jsonLB.length == 0) {
-                            loadProgress += 1;
-                            loadCounter.innerHTML = "loading... " + (loadProgress / IDCount * 100).toFixed(3) + `% <br> (${loadProgress}/${IDCount})`;
-                            return ["Empty Leaderboard", track]
-                        }
-
-                    })
-                fetches.push(fetcH);
-            } catch (error) {
-                console.log(error);
-            }
+            batchFetches.push(fetcH);
         }
 
-        Promise.all(fetches)
-            .then((users) => {
-                recorddict = condense(users);
-                indexlist = valueSort(recorddict);
+        return Promise.all(batchFetches);
+    };
 
-                for (let i = 0; i < indexlist.length; i++) {
-                    createDropdown(indexlist[i] + ": " + recorddict[indexlist[i]].length.toString(), recorddict[indexlist[i]]);
-                }
+    const fetchChunks = Array.from({ length: Math.ceil(IDCount / batchSize) }, (_, index) => {
+        const start = index * batchSize;
+        const end = start + batchSize;
+        return fetchBatch(start, end);
+    });
 
-                document.getElementById("loading").innerHTML = "";
-                document.getElementById("loadingNum").innerHTML = "";
-                console.log(indexlist);
-                console.log(recorddict);
+    Promise.all(fetchChunks)
+        .then(usersChunks => {
+            const users = usersChunks.flat();
+            const recorddict = condense(users);
+            const indexlist = valueSort(recorddict);
 
-                dataList = [];
+            for (let i = 0; i < indexlist.length; i++) {
+                createDropdown(`${indexlist[i]}: ${recorddict[indexlist[i]].length.toString()}`, recorddict[indexlist[i]]);
+            }
 
-                for (let i = 0; i < indexlist.length; i++) {
-                    dataDict = {
-                        'x': indexlist[i],
-                        'y': recorddict[indexlist[i]].length
-                    };
-                    dataList.push(dataDict);
-                }
+            document.getElementById("loading").innerHTML = "";
+            document.getElementById("loadingNum").innerHTML = "";
+            console.log(indexlist);
+            console.log(recorddict);
 
-                displayPie(dataList);
-
-            });
-    }, 100000)
+            const dataList = indexlist.map(key => ({ 'x': key, 'y': recorddict[key].length }));
+            displayPie(dataList);
+        })
+        .catch(error => console.log(error));
 }
 // end of function
 
