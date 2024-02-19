@@ -364,6 +364,9 @@ async function wrCount(countAll) {
                     // run the last pages that don't fit in the batch size.
                     for (I < amountOfPages) {
                         I += 1;
+                        loadProgress += 1;
+                        loadCounter.innerHTML = "loading track ID's... " + (loadProgress / amountOfPages * 100).toFixed(3) + `% <br> (${loadProgress}/${amountOfPages})`;
+
                         let result = await fetchTracks(I)
                         IDarr.push(...result);
 
