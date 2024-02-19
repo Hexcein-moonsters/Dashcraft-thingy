@@ -362,8 +362,7 @@ async function wrCount(countAll) {
                 if (I2 == batchAmount) {
                     // last batch, no need to run a batch again
                     // run the last pages that don't fit in the batch size.
-                    for (I < amountOfPages) {
-                        I += 1;
+                    for (; I < amountOfPages; I++) {
                         loadProgress += 1;
                         loadCounter.innerHTML = "loading track ID's... " + (loadProgress / amountOfPages * 100).toFixed(3) + `% <br> (${loadProgress}/${amountOfPages})`;
 
