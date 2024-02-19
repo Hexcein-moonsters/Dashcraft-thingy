@@ -159,7 +159,7 @@ async function wrCount(countAll) {
       I += 1;
     }
   } else {
-    IDarr = await fetch("https://dashcraft-thingy.lovelylagrande.repl.co/alltracks.json");
+    IDarr = await fetch("alltracks.json");
     IDarr = await IDarr.json();
   }
   
