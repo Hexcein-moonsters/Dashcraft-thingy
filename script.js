@@ -253,6 +253,9 @@ let time = performance.now()
       promises.push(fetchTracks(I));
       I += 1;
       console.log("next track fetch");
+      loadProgress += 1;
+      loadCounter.innerHTML = "loading track ID's... " + (loadProgress / amountOfPages * 100).toFixed(3) + `% <br> (${loadProgress}/${amountOfPages})`;
+   
     }
         } else {
             
@@ -295,6 +298,7 @@ let time = performance.now()
 
 function IDtoPlayers(IDs) {
   var IDCount = IDs.length;
+console.log(IDCount)
   var loadCounter = document.getElementById("loadingNum");
   var loadProgress = 0;
   
