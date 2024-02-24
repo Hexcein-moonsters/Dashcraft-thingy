@@ -391,7 +391,10 @@ let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
 console.log(wrData)
-     displayPie(dataList);
+    const indexlist = valueSort(wrData);
+ const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
+    displayPie(dataList);
+
     
     const promises = [];
  const batchStartTime = performance.now(); // record the start time of each batch
