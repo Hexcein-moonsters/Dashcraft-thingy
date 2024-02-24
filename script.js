@@ -411,7 +411,7 @@ console.log(wrData)
                     const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
-                    const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
+                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
                     remainingTime = remainingTime/1000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
 
@@ -432,7 +432,7 @@ console.log(wrData)
                     const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
-                    const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
+                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
                  remainingTime = remainingTime/1000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
                 }
