@@ -207,7 +207,7 @@ function wrSort(obj) {
 }
 
 function pieSort(dict) {
-    var items = Object.keys(dict).map(
+    const items = Object.keys(dict).map(
         (key) => {
             return { name: key, 'wr-amount': dict[key] };
         });
@@ -220,6 +220,7 @@ function pieSort(dict) {
 
     return items;
 }
+
 
 async function wrCount(countAll) {
     document.getElementById("loading").innerHTML = "loading... please wait about 10 seconds";
