@@ -13,33 +13,19 @@ function main() {
         .then((json) => sendPieces(json));
 }
 
-function createDropdown(playerName, recordList) {
-    dropdown = document.createElement("div");
+function createDropdown(playerName) {
+    // Display only the amount of WRs without additional details
+    const dropdown = document.createElement("div");
     dropdown.className = "dropdown";
 
-    button = document.createElement("button");
+    const button = document.createElement("button");
     button.className = "dropbtn";
     button.innerHTML = playerName;
     dropdown.appendChild(button);
 
-    dropContent = document.createElement("div");
-    dropContent.className = "dropdown-content";
-
-    for (let i = 0; i < recordList.length; i++) {
-        listItem = document.createElement("a");
-        listItem.target = "_blank";
-        listItem.href = "https://dashcraft.io/?t=" + recordList[i][0];
-        listItem.innerHTML = recordList[i][1];
-        dropContent.appendChild(listItem);
-    }
-
-    dropdown.appendChild(dropContent);
-
     document.getElementById("recordList").appendChild(dropdown);
     document.getElementById("recordList").appendChild(document.createElement("br"));
-
 }
-
 
 function sendOut(response) {
     trackname = response.name;
@@ -393,6 +379,8 @@ function IDtoPlayers(IDs) {
     const loadCounter = document.getElementById("loadingNum");
     let loadProgress = 0;
 
+    const wrData = {};
+
     const fetches = [];
     const checkCheats = document.getElementById("cheatFilter").checked;
     const batchSize = 100;
@@ -404,26 +392,25 @@ function IDtoPlayers(IDs) {
                 .then(response => response.json())
                 .then(json => {
                     const jsonLB = json.leaderboard;
-                    const trackName = json.name || "Unnamed Track";
-                    const track = [json._id, trackName];
 
-                    for (let v = 0; v < jsonLB.length; v++) {
-                        const username = jsonLB[v].userId.username;
-                        const time = jsonLB[v].time;
+                    if (jsonLB.length > 0) {
+                        loadProgress++;
+                        loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
 
-                        if (!checkCheats || (!banlist.includes(username) /* || (Math.round(time) == time)*/ )) {
-                            loadProgress++;
-                            loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
-                            return [username, track];
+                        const username = jsonLB[0].userId.username; // Get the username from the first entry in the leaderboard
+
+                        if (!checkCheats || (!banlist.includes(username))) {
+                            if (wrData[username]) {
+                                wrData[username]++;
+                            } else {
+                                wrData[username] = 1;
+                            }
                         } else {
                             console.log(`${username} -- ${IDs[ID]}`);
                         }
-                    }
-
-                    if (jsonLB.length === 0) {
+                    } else {
                         loadProgress++;
                         loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
-                        return ["Empty Leaderboard", track];
                     }
                 });
 
@@ -440,21 +427,20 @@ function IDtoPlayers(IDs) {
     });
 
     Promise.all(fetchChunks)
-        .then(usersChunks => {
-            const users = usersChunks.flat();
-            const recorddict = condense(users);
-            const indexlist = valueSort(recorddict);
+        .then(() => {
+            const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
+            const indexlist = valueSort(wrData);
 
             for (let i = 0; i < indexlist.length; i++) {
-                createDropdown(`${indexlist[i]}: ${recorddict[indexlist[i]].length.toString()}`, recorddict[indexlist[i]]);
+                // Display only the amount of WRs in the dropdown
+                createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]].toString()}`);
             }
 
             document.getElementById("loading").innerHTML = "";
             document.getElementById("loadingNum").innerHTML = "";
-            console.log(indexlist);
-            console.log(recorddict);
+            console.log(sortedData);
 
-            const dataList = indexlist.map(key => ({ 'x': key, 'y': recorddict[key].length }));
+            const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
             displayPie(dataList);
         })
         .catch(error => console.log(error));
