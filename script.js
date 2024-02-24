@@ -193,16 +193,17 @@ function valueSort(dict) {
     return keys;
 }
 
-function wrSort(wrData) {
-    var sortedData = {};
+function wrSort(obj) {
+    // Convert the object into an array of key-value pairs
+    const entries = Object.entries(obj);
 
-    Object.keys(wrData)
-        .sort((a, b) => wrData[b] - wrData[a])  // Sorting keys based on the values
-        .forEach(key => {
-            sortedData[key] = wrData[key];
-        });
+    // Sort the array based on the values in descending order
+    entries.sort((a, b) => b[1] - a[1]);
 
-    return sortedData;
+    // Convert the sorted array back to an object
+    const sortedObj = Object.fromEntries(entries);
+
+    return sortedObj;
 }
 
 
