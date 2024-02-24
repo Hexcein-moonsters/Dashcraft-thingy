@@ -388,7 +388,9 @@ const batchSize = 200;
 const totalBatches = Math.ceil(IDCount / batchSize);
 
 let totalElapsedTime = 0;
-
+    
+let batchWaited = false;
+    
 async function fetchData(start, end) {
     
     const promises = [];
@@ -435,11 +437,17 @@ async function fetchData(start, end) {
                  remainingTime = remainingTime/10000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
                 }
-                 const shouldWait = loadProgress % 7000 === 0;
-                if (shouldWait) {
+                
+                if (loadProgress % 7000 === 0 && !batchWaited) {
                     // If loadProgress is a multiple of 7000, wait for 5 seconds
+                    batchWaited = true;  // Set batchWaited to true to avoid waiting for subsequent requests in the same batch
                     return waitFiveSeconds().then(() => fetchPromise);
                 }
+
+                if (loadProgress % 7000 !== 0) {
+                    batchWaited = false;  // Reset batchWaited if loadProgress is not a multiple of 7000
+                }
+                
             });
 
         promises.push(fetchPromise);
