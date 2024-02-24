@@ -427,6 +427,12 @@ async function fetchData(start, end) {
                 } else {
                     loadProgress++;
                     const percentageComplete = (loadProgress / IDCount) * 100;
+                       const percentageComplete = (loadProgress / IDCount) * 100;
+                    const elapsedTime = (performance.now() - batchStartTime) / 1000;
+                    totalElapsedTime += elapsedTime;
+
+                    const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete);
+                 
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed(2)} seconds`;
                 }
             });
