@@ -427,7 +427,6 @@ async function fetchData(start, end) {
                 } else {
                     loadProgress++;
                     const percentageComplete = (loadProgress / IDCount) * 100;
-                       const percentageComplete = (loadProgress / IDCount) * 100;
                     const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
