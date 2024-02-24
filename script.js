@@ -390,11 +390,6 @@ const totalBatches = Math.ceil(IDCount / batchSize);
 let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
-console.log(wrData)
-    const indexlist = valueSort(wrData);
- const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
-    displayPie(dataList);
-
     
     const promises = [];
  const batchStartTime = performance.now(); // record the start time of each batch
@@ -449,6 +444,11 @@ console.log(wrData)
 
         promises.push(fetchPromise);
     }
+    
+console.log(wrData)
+    const indexlist = valueSort(wrData);
+ const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
+    displayPie(dataList);
 
     return Promise.all(promises);
 }
