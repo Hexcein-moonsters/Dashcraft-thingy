@@ -467,7 +467,7 @@ async function fetchData(start, end) {
         promises.push(fetchPromise);
     }
     
-            const sortedData = wrSort(wrData);
+            const sortedData = await wrSort(wrData);
     console.log(sortedData)
     return Promise.all(promises);
 }
