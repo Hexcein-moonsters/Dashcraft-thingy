@@ -384,7 +384,7 @@ function IDtoPlayers(IDs) {
     const checkCheats = document.getElementById("cheatFilter").checked;
 
     
-const batchSize = 2000;
+const batchSize = 200;
 const totalBatches = Math.ceil(IDCount / batchSize);
 
 let totalElapsedTime = 0;
