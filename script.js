@@ -391,6 +391,7 @@ let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
 console.log(wrData)
+     displayPie(dataList);
     
     const promises = [];
  const batchStartTime = performance.now(); // record the start time of each batch
@@ -435,6 +436,11 @@ console.log(wrData)
                     let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN TEN MILISECONDS
                  remainingTime = remainingTime/10000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
+                }
+                 const shouldWait = loadProgress % 7000 === 0;
+                if (shouldWait) {
+                    // If loadProgress is a multiple of 7000, wait for 5 seconds
+                    return waitFiveSeconds().then(() => fetchPromise);
                 }
             });
 
@@ -523,4 +529,14 @@ function displayPie(theData) {
 
     document.getElementById("container").innerHTML = "";
     pie.appendTo('#container');
+}
+
+
+
+function waitFiveSeconds() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve();
+        }, 5000);
+    });
 }
