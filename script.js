@@ -198,7 +198,7 @@ async function wrCount(countAll) {
     document.getElementById("recordList").innerHTML = "";
 
     if (countAll) {
-        document.getElementById("loading").innerHTML = "loading... you may have to wait a while for this one";
+        document.getElementById("loading").innerHTML = "loading... you may have to wait a while for this one <br> DO NOT SWITCH TABS!";
     }
 
     var fetches = [];
