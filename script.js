@@ -391,7 +391,8 @@ let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
     const promises = [];
-
+ const batchStartTime = performance.now(); // record the start time of each batch
+   
     for (let ID = start; ID < end; ID++) {
         if (IDs[ID] == undefined) {
             return;
@@ -405,7 +406,7 @@ async function fetchData(start, end) {
                 if (jsonLB.length > 0) {
                     loadProgress++;
                     const percentageComplete = (loadProgress / IDCount) * 100;
-                    const elapsedTime = (performance.now() - time) / 1000;
+                    const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
                     const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete);
