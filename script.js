@@ -193,6 +193,30 @@ function valueSort(dict) {
     return keys;
 }
 
+function wrSort(wrData) {
+    var items = Object.keys(wrData).map(
+        key => {
+            return [key, wrData[key]];
+        }
+    );
+
+    items.sort(
+        (first, second) => {
+            return second[1] - first[1];
+        }
+    );
+
+    var keys = items.map(
+        e => {
+            return e[0];
+        }
+    );
+
+    return keys;
+}
+
+
+
 async function wrCount(countAll) {
     document.getElementById("loading").innerHTML = "loading... please wait about 10 seconds";
     document.getElementById("recordList").innerHTML = "";
@@ -453,7 +477,8 @@ async function fetchData(start, end) {
         promises.push(fetchPromise);
     }
     
-console.log(wrData)
+            const sortedData = wrSort(wrData);
+    console.log(sortedData)
     return Promise.all(promises);
 }
 
