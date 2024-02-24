@@ -194,18 +194,17 @@ function valueSort(dict) {
 }
 
 function wrSort(obj) {
-    // Convert the object into an array of key-value pairs
     const entries = Object.entries(obj);
 
-    // Sort the array based on the values in descending order
     entries.sort((a, b) => b[1] - a[1]);
 
-    // Convert the sorted array back to an object
-    const sortedObj = Object.fromEntries(entries);
+    const sortedObj = {};
+    for (const [key, value] of entries) {
+        sortedObj[key] = value;
+    }
 
     return sortedObj;
 }
-
 
 
 async function wrCount(countAll) {
