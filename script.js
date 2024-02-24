@@ -381,72 +381,86 @@ function IDtoPlayers(IDs) {
 
     const wrData = {};
 
-    const fetches = [];
     const checkCheats = document.getElementById("cheatFilter").checked;
-    const batchSize = 100;
 
-    const fetchBatch = async (start, end) => {
-        const batchFetches = [];
-        for (let ID = start; ID < end; ID++) {
-            if (IDs[ID] == undefined) {
-                return
-            }
-            const fetcH = fetch("https://api.dashcraft.io/track/" + IDs[ID] + "?supportsLaps1=true")
-                .then(response => response.json())
-                .then(json => {
-                    const jsonLB = json.leaderboard;
+    
+const batchSize = 100;
+const totalBatches = Math.ceil(IDCount / batchSize);
 
-                    if (jsonLB.length > 0) {
-                        loadProgress++;
-                        loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+async function fetchData(start, end) {
+    const promises = [];
 
-                        const username = jsonLB[0].userId.username; // Get the username from the first entry in the leaderboard
-
-                        if (!checkCheats || (!banlist.includes(username))) {
-                            if (wrData[username]) {
-                                wrData[username]++;
-                            } else {
-                                wrData[username] = 1;
-                            }
-                        } else {
-                            console.log(`${username} -- ${IDs[ID]}`);
-                        }
-                    } else {
-                        loadProgress++;
-                        loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
-                    }
-                });
-
-            batchFetches.push(fetcH);
+    for (let ID = start; ID < end; ID++) {
+        if (IDs[ID] == undefined) {
+            return;
         }
 
-        return Promise.all(batchFetches);
-    };
+        const fetchPromise = fetch("https://api.dashcraft.io/track/" + IDs[ID] + "?supportsLaps1=true")
+            .then(response => response.json())
+            .then(json => {
+                const jsonLB = json.leaderboard;
 
-    const fetchChunks = Array.from({ length: Math.ceil(IDCount / batchSize) }, (_, index) => {
-        const start = index * batchSize;
-        const end = start + batchSize;
-        return fetchBatch(start, end);
-    });
+                if (jsonLB.length > 0) {
+                    loadProgress++;
+                    loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
 
-    Promise.all(fetchChunks)
-        .then(() => {
-            const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
-            const indexlist = valueSort(wrData);
+                    const username = jsonLB[0].userId.username;
 
-            for (let i = 0; i < indexlist.length; i++) {
-                // Display only the amount of WRs in the dropdown
-                createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]].toString()}`);
+                    if (!checkCheats || (!banlist.includes(username))) {
+                        if (wrData[username]) {
+                            wrData[username]++;
+                        } else {
+                            wrData[username] = 1;
+                        }
+                    } else {
+                        console.log(`${username} -- ${IDs[ID]}`);
+                    }
+                } else {
+                    loadProgress++;
+                    loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+                }
+            });
+
+        promises.push(fetchPromise);
+    }
+
+    return Promise.all(promises);
+}
+
+async function processBatches() {
+    for (let i = 0; i < totalBatches; i++) {
+        const start = i * batchSize;
+        const end = Math.min((i + 1) * batchSize, IDCount);
+
+        await fetchData(start, end);
+
+        if (i === totalBatches - 1 && end < IDCount) {
+            // Process the remaining IDs individually
+            for (let j = end; j < IDCount; j++) {
+                await fetchData(j, j + 1);
             }
+        }
+    }
 
-            document.getElementById("loading").innerHTML = "";
-            document.getElementById("loadingNum").innerHTML = "";
-            console.log(sortedData);
+    // Run the code after processing all batches
+    const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
+    const indexlist = valueSort(wrData);
 
-            const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
-            displayPie(dataList);
-        })
-        .catch(error => console.log(error));
+    for (let i = 0; i < indexlist.length; i++) {
+        // Display only the amount of WRs in the dropdown
+        createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]].toString()}`);
+    }
+
+    document.getElementById("loading").innerHTML = "";
+    document.getElementById("loadingNum").innerHTML = "";
+    console.log(sortedData);
+
+    const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
+    displayPie(dataList);
+}
+
+// Call the function to start processing batches
+processBatches();
 }
 // end of function
 
