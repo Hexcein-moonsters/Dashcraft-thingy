@@ -390,6 +390,8 @@ const totalBatches = Math.ceil(IDCount / batchSize);
 let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
+console.log(wrData)
+    
     const promises = [];
  const batchStartTime = performance.now(); // record the start time of each batch
     
@@ -410,8 +412,8 @@ async function fetchData(start, end) {
                     totalElapsedTime += elapsedTime;
 
                     const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
-                    
-                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime/1000} seconds`;
+                    remainingTime = remainingTime/1000 // convert to minutes
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
 
                     const username = jsonLB[0].userId.username;
 
@@ -431,8 +433,8 @@ async function fetchData(start, end) {
                     totalElapsedTime += elapsedTime;
 
                     const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
-                 
-                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime/1000} seconds`;
+                 remainingTime = remainingTime/1000 // convert to minutes
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
                 }
             });
 
