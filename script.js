@@ -411,8 +411,8 @@ console.log(wrData)
                     const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
-                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
-                    remainingTime = remainingTime/1000 // convert to minutes
+                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN TEN MILISECONDS
+                    remainingTime = remainingTime/10000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
 
                     const username = jsonLB[0].userId.username;
@@ -432,8 +432,8 @@ console.log(wrData)
                     const elapsedTime = (performance.now() - batchStartTime) / 1000;
                     totalElapsedTime += elapsedTime;
 
-                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
-                 remainingTime = remainingTime/1000 // convert to minutes
+                    let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN TEN MILISECONDS
+                 remainingTime = remainingTime/10000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
                 }
             });
