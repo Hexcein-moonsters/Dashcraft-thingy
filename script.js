@@ -206,6 +206,20 @@ function wrSort(obj) {
     return sortedObj;
 }
 
+function pieSort(dict) {
+    var items = Object.keys(dict).map(
+        (key) => {
+            return { name: key, 'wr-amount': dict[key] };
+        });
+
+    items.sort(
+        (first, second) => {
+            return second['wr-amount'] - first['wr-amount'];
+        }
+    );
+
+    return items;
+}
 
 async function wrCount(countAll) {
     document.getElementById("loading").innerHTML = "loading... please wait about 10 seconds";
@@ -490,7 +504,7 @@ async function processBatches() {
 
     // Run the code after processing all batches
     const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
-    const indexlist = valueSort(wrData);
+    const indexlist = pieSort(wrData);
 
     for (let i = 0; i < indexlist.length; i++) {
         // Display only the amount of WRs in the dropdown
