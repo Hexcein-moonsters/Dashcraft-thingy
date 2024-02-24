@@ -388,6 +388,9 @@ function IDtoPlayers(IDs) {
     const fetchBatch = async (start, end) => {
         const batchFetches = [];
         for (let ID = start; ID < end; ID++) {
+            if (IDs[ID] == undefined) {
+                return
+            }
             const fetcH = fetch("https://api.dashcraft.io/track/" + IDs[ID] + "?supportsLaps1=true")
                 .then(response => response.json())
                 .then(json => {
