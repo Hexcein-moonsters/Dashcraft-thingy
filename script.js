@@ -392,7 +392,7 @@ let totalElapsedTime = 0;
 async function fetchData(start, end) {
     const promises = [];
  const batchStartTime = performance.now(); // record the start time of each batch
-   
+    
     for (let ID = start; ID < end; ID++) {
         if (IDs[ID] == undefined) {
             return;
