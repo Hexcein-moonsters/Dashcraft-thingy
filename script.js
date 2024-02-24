@@ -384,8 +384,10 @@ function IDtoPlayers(IDs) {
     const checkCheats = document.getElementById("cheatFilter").checked;
 
     
-const batchSize = 100;
+const batchSize = 2000;
 const totalBatches = Math.ceil(IDCount / batchSize);
+
+let totalElapsedTime = 0;
 
 async function fetchData(start, end) {
     const promises = [];
@@ -402,7 +404,13 @@ async function fetchData(start, end) {
 
                 if (jsonLB.length > 0) {
                     loadProgress++;
-                    loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+                    const percentageComplete = (loadProgress / IDCount) * 100;
+                    const elapsedTime = (performance.now() - time) / 1000;
+                    totalElapsedTime += elapsedTime;
+
+                    const remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete);
+                    
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed(2)} seconds`;
 
                     const username = jsonLB[0].userId.username;
 
@@ -417,7 +425,8 @@ async function fetchData(start, end) {
                     }
                 } else {
                     loadProgress++;
-                    loadCounter.innerHTML = `loading... ${(loadProgress / IDCount * 100).toFixed(3)}% <br> (${loadProgress}/${IDCount})`;
+                    const percentageComplete = (loadProgress / IDCount) * 100;
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed(2)} seconds`;
                 }
             });
 
@@ -428,6 +437,7 @@ async function fetchData(start, end) {
 }
 
 async function processBatches() {
+    let time = performance.now()
     for (let i = 0; i < totalBatches; i++) {
         const start = i * batchSize;
         const end = Math.min((i + 1) * batchSize, IDCount);
@@ -457,6 +467,7 @@ async function processBatches() {
 
     const dataList = indexlist.map(key => ({ 'x': key, 'y': wrData[key] }));
     displayPie(dataList);
+console.log("Total time to get every single world record:",(performance.now()-time)/1000)
 }
 
 // Call the function to start processing batches
