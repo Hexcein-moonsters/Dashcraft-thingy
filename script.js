@@ -413,7 +413,7 @@ console.log(wrData)
 
                     let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
                     remainingTime = remainingTime/1000 // convert to minutes
-                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
 
                     const username = jsonLB[0].userId.username;
 
@@ -434,7 +434,7 @@ console.log(wrData)
 
                     let remainingTime = (100 - percentageComplete) * (totalElapsedTime / percentageComplete); // IN MILISECONDS
                  remainingTime = remainingTime/1000 // convert to minutes
-                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime} minutes`;
+                    loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
                 }
             });
 
