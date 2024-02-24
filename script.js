@@ -504,7 +504,7 @@ async function processBatches() {
 
     // Run the code after processing all batches
     const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
-    const indexlist = pieSort(wrData);
+    const indexlist = await pieSort(wrData);
 
     for (let i = 0; i < indexlist.length; i++) {
         // Display only the amount of WRs in the dropdown
