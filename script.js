@@ -194,25 +194,15 @@ function valueSort(dict) {
 }
 
 function wrSort(wrData) {
-    var items = Object.keys(wrData).map(
-        key => {
-            return [key, wrData[key]];
-        }
-    );
+    var sortedData = {};
 
-    items.sort(
-        (first, second) => {
-            return second[1] - first[1];
-        }
-    );
+    Object.keys(wrData)
+        .sort((a, b) => wrData[b] - wrData[a])  // Sorting keys based on the values
+        .forEach(key => {
+            sortedData[key] = wrData[key];
+        });
 
-    var keys = items.map(
-        e => {
-            return e[0];
-        }
-    );
-
-    return keys;
+    return sortedData;
 }
 
 
