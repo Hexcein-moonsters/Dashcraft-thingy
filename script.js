@@ -193,35 +193,6 @@ function valueSort(dict) {
     return keys;
 }
 
-function wrSort(obj) {
-    const entries = Object.entries(obj);
-
-    entries.sort((a, b) => b[1] - a[1]);
-
-    const sortedObj = {};
-    for (const [key, value] of entries) {
-        sortedObj[key] = value;
-    }
-
-    return sortedObj;
-}
-
-function pieSort(dict) {
-    const items = Object.keys(dict).map(
-        (key) => {
-            return { name: key, 'wr-amount': dict[key] };
-        });
-
-    items.sort(
-        (first, second) => {
-            return second['wr-amount'] - first['wr-amount'];
-        }
-    );
-
-    return items;
-}
-
-
 async function wrCount(countAll) {
     document.getElementById("loading").innerHTML = "loading... please wait about 10 seconds";
     document.getElementById("recordList").innerHTML = "";
@@ -417,9 +388,7 @@ const batchSize = 200;
 const totalBatches = Math.ceil(IDCount / batchSize);
 
 let totalElapsedTime = 0;
-    
-let batchWaited = false;
-    
+
 async function fetchData(start, end) {
     
     const promises = [];
@@ -466,24 +435,17 @@ async function fetchData(start, end) {
                  remainingTime = remainingTime/10000 // convert to minutes
                     loadCounter.innerHTML = `loading... ${percentageComplete.toFixed(3)}% <br> (${loadProgress}/${IDCount}) | Remaining Time: ${remainingTime.toFixed()} minutes`;
                 }
-                
-                if (loadProgress % 7000 === 0 && !batchWaited) {
+                 const shouldWait = loadProgress % 7000 === 0;
+                if (shouldWait) {
                     // If loadProgress is a multiple of 7000, wait for 5 seconds
-                    batchWaited = true;  // Set batchWaited to true to avoid waiting for subsequent requests in the same batch
                     return waitFiveSeconds().then(() => fetchPromise);
                 }
-
-                if (loadProgress % 7000 !== 0) {
-                    batchWaited = false;  // Reset batchWaited if loadProgress is not a multiple of 7000
-                }
-                
             });
 
         promises.push(fetchPromise);
     }
     
-            const sortedData = await wrSort(wrData);
-    console.log(sortedData)
+console.log(wrData)
     return Promise.all(promises);
 }
 
@@ -505,11 +467,11 @@ async function processBatches() {
 
     // Run the code after processing all batches
     const sortedData = Object.keys(wrData).map(username => ({ name: username, 'wr-amount': wrData[username] }));
-    const indexlist = await pieSort(wrData);
+    const indexlist = valueSort(wrData);
 
     for (let i = 0; i < indexlist.length; i++) {
         // Display only the amount of WRs in the dropdown
-        createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]]}`);
+        createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]].toString()}`);
     }
 
     document.getElementById("loading").innerHTML = "";
