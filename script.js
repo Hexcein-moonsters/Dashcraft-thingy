@@ -509,7 +509,7 @@ async function processBatches() {
 
     for (let i = 0; i < indexlist.length; i++) {
         // Display only the amount of WRs in the dropdown
-        createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]].toString()}`);
+        createDropdown(`${indexlist[i]}: ${wrData[indexlist[i]]}`);
     }
 
     document.getElementById("loading").innerHTML = "";
